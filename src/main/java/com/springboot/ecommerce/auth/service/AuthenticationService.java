@@ -7,8 +7,6 @@ import com.springboot.ecommerce.user.User;
 import com.springboot.ecommerce.user.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class AuthenticationService {
 
@@ -19,10 +17,9 @@ public class AuthenticationService {
     }
 
     public UserCreationResponseDTO signup(UserCreationDTO userCreationDTO) {
-        Optional<User> userExists = userRepository.findByEmail(userCreationDTO.getEmail());
-        if (userExists.isPresent()) {
-            throw new UserAlreadyExistsException("User with email " + userCreationDTO.getEmail() + " already exists");
-        }
+        userRepository
+                .findByEmail(userCreationDTO.getEmail())
+                .orElseThrow(() -> new UserAlreadyExistsException("User with email " + userCreationDTO.getEmail() + " already exists"));
 
         User user = new User();
         user.setFirstName(userCreationDTO.getFirst_name());

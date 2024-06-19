@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -48,13 +47,9 @@ public class CategoryService {
     }
 
     private Category findById(Integer id) {
-        Optional<Category> category = categoryRepository.findById(id);
-
-        if (category.isEmpty()) {
-            throw new CategoryNotFoundException("No category found against this id: " + id);
-        }
-
-        return category.get();
+        return categoryRepository
+                .findById(id)
+                .orElseThrow(() -> new CategoryNotFoundException("No category found against this id: " + id));
     }
 
     private CategoryResponse convertToDTO(Category category) {

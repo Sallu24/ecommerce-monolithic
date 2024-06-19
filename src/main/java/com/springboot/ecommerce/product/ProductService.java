@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -90,13 +89,9 @@ public class ProductService {
     }
 
     public Product findById(Integer id) {
-        Optional<Product> product = productRepository.findById(id);
-
-        if (product.isEmpty()) {
-            throw new ProductNotFoundException("No product found against this id: " + id);
-        }
-
-        return product.get();
+        return productRepository
+                .findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("No product found against this id: " + id));
     }
 
     private ProductResponse convertToDTO(Product product) {

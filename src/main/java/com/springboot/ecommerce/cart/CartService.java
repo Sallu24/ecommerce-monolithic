@@ -9,7 +9,6 @@ import com.springboot.ecommerce.user.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CartService {
@@ -157,13 +156,9 @@ public class CartService {
     }
 
     public CartItem findById(Integer id) {
-        Optional<CartItem> cartItem = cartItemRepository.findById(id);
-
-        if (cartItem.isEmpty()) {
-            throw new CartItemNotFoundException("No cart item found against this id: " + id);
-        }
-
-        return cartItem.get();
+        return cartItemRepository
+                .findById(id)
+                .orElseThrow(() -> new CartItemNotFoundException("No cart item found against this id: " + id));
     }
 
     private void findCartById(Integer userId) {

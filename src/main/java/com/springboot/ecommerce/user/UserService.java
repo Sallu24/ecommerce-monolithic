@@ -3,8 +3,6 @@ package com.springboot.ecommerce.user;
 import com.springboot.ecommerce.auth.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class UserService {
 
@@ -15,12 +13,8 @@ public class UserService {
     }
 
     public User findById(Integer userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isEmpty()) {
-            throw new UserNotFoundException("No user found against this id: " + 1);
-        }
-
-        return user.get();
+        return userRepository
+                .findById(userId).orElseThrow(() -> new UserNotFoundException("No user found against this id: " + userId));
     }
 
 }

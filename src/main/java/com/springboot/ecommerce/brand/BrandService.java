@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,13 +29,9 @@ public class BrandService {
     }
 
     private Brand findById(Integer id) {
-        Optional<Brand> brand = brandRepository.findById(id);
-
-        if (brand.isEmpty()) {
-            throw new BrandNotFoundException("No brand found against this id: " + id);
-        }
-
-        return brand.get();
+        return brandRepository
+                .findById(id)
+                .orElseThrow(() -> new BrandNotFoundException("No brand found against this id: " + id));
     }
 
     protected BrandResponse view(Integer id) {
