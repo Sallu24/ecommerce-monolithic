@@ -9,7 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name = "products")
+@Entity
+@Table(name = "products")
 public class Product {
 
     @Id

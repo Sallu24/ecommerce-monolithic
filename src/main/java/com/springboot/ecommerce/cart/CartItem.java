@@ -7,7 +7,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
-@Entity(name = "cart_items")
+@Entity
+@Table(name = "cart_items")
 public class CartItem {
 
     @Id

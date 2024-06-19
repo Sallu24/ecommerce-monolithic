@@ -6,7 +6,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
