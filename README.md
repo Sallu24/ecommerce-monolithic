@@ -1,2 +1,2 @@
-# ecommerce
-A Java Spring Boot Rest API Project
+# ecommerce-monolithic
+A Java Spring Boot Monolithic Rest API Project
