@@ -1,5 +1,6 @@
 package com.springboot.ecommerce.exception;
 
+import com.springboot.ecommerce.auth.exception.CredentialsMismatchException;
 import com.springboot.ecommerce.auth.exception.UserAlreadyExistsException;
 import com.springboot.ecommerce.auth.exception.UserNotFoundException;
 import com.springboot.ecommerce.brand.BrandNotFoundException;
@@ -48,6 +49,14 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
                 request.getDescription(false));
 
         return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CredentialsMismatchException.class)
+    public final ResponseEntity<ErrorDetails> handleCredentialsMismatchException(Exception ex, WebRequest request) throws Exception {
+        ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMessage(),
+                request.getDescription(false));
+
+        return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(BrandNotFoundException.class)

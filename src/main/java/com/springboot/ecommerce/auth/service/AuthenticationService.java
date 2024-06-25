@@ -2,40 +2,67 @@ package com.springboot.ecommerce.auth.service;
 
 import com.springboot.ecommerce.auth.dto.UserCreationDTO;
 import com.springboot.ecommerce.auth.dto.UserCreationResponseDTO;
-import com.springboot.ecommerce.auth.exception.UserAlreadyExistsException;
+import com.springboot.ecommerce.auth.dto.UserLoginDTO;
+import com.springboot.ecommerce.auth.dto.UserLoginResponseDTO;
+import com.springboot.ecommerce.auth.exception.CredentialsMismatchException;
+import com.springboot.ecommerce.jwt.JwtUtils;
 import com.springboot.ecommerce.user.User;
-import com.springboot.ecommerce.user.UserRepository;
+import com.springboot.ecommerce.user.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationService {
 
-    protected UserRepository userRepository;
+    private final UserService userService;
 
-    public AuthenticationService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    private final JwtUtils jwtUtils;
+
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthenticationService(UserService userService, JwtUtils jwtUtils, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.jwtUtils = jwtUtils;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserCreationResponseDTO signup(UserCreationDTO userCreationDTO) {
-        userRepository
-                .findByEmail(userCreationDTO.getEmail())
-                .orElseThrow(() -> new UserAlreadyExistsException("User with email " + userCreationDTO.getEmail() + " already exists"));
+        String email = userCreationDTO.getEmail();
+        userService.userExistsByEmail(email);
 
-        User user = new User();
-        user.setFirstName(userCreationDTO.getFirst_name());
-        user.setLastName(userCreationDTO.getLast_name());
-        user.setLastName(userCreationDTO.getLast_name());
-        user.setEmail(userCreationDTO.getEmail());
-        user.setPhone(userCreationDTO.getPhone());
-        user.setPassword(userCreationDTO.getPassword());
-        userRepository.save(user);
+        User user = userService.createUser(
+                userCreationDTO,
+                passwordEncoder.encode(userCreationDTO.getPassword())
+        );
 
-        // Create and return the response DTO
         return new UserCreationResponseDTO(
                 user.getFirstName(),
                 user.getLastName(),
                 user.getEmail(),
                 user.getPhone()
         );
+    }
+
+    public ResponseEntity<?> signin(UserLoginDTO userLoginDTO) {
+        String email = userLoginDTO.getEmail();
+        String password = userLoginDTO.getPassword();
+
+        User user = userService.findByEmail(email);
+        if (passwordEncoder.matches(password, user.getPassword())) {
+            String jwtToken = jwtUtils.generateJwtToken(user);
+
+            UserLoginResponseDTO responseDTO = new UserLoginResponseDTO(
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    user.getPhone(),
+                    jwtToken
+            );
+
+            return ResponseEntity.ok(responseDTO);
+        } else {
+            throw new CredentialsMismatchException("Incorrect password ");
+        }
     }
 }
